@@ -1,17 +1,82 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 function Form() {
   const [dishName, setDishName] = useState("");
   const [preparationTime, setPreparationTime] = useState("12:00:00");
   const [dish, setDish] = useState("");
-
   const [numberSlices, setNumberSlices] = useState("");
   const [pizzaDiametr, setPizzaDiametr] = useState("");
-  const [soupSpiceness, setSoupSpiceness] = useState("");
+  const [soupSpiceness, setSoupSpiceness] = useState("5");
   const [breadSlices, setBreadSlices] = useState("");
 
+  const onClickOrder = () => {
+    if (dish === "sandwich") {
+      axios({
+        method: "post",
+        url: "https://frosty-wood-6558.getsandbox.com:443/dishes",
+        data: {
+          name: dishName,
+          preparation_time: preparationTime,
+          type: dish,
+          slices_of_bread: parseInt(breadSlices),
+        },
+      })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+    if (dish === "soup") {
+      axios({
+        method: "post",
+        url: "https://frosty-wood-6558.getsandbox.com:443/dishes",
+        data: {
+          name: dishName,
+          preparation_time: preparationTime,
+          type: dish,
+          spiciness_scale: parseInt(soupSpiceness),
+        },
+      })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+    if (dish === "pizza") {
+      axios
+        .post("https://frosty-wood-6558.getsandbox.com:443/dishes", {
+          name: dishName,
+          preparation_time: preparationTime,
+          type: dish,
+          no_of_slices: parseInt(numberSlices),
+          diameter: parseFloat(pizzaDiametr),
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  };
   return (
-    <form>
+    <form
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          onClickOrder();
+        }
+      }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        onClickOrder();
+      }}
+    >
       <input
         value={dishName}
         onChange={(e) => setDishName(e.target.value)}
@@ -32,11 +97,10 @@ function Form() {
       <select
         onChange={(e) => setDish(e.target.value)}
         value={dish}
-        name="cars"
-        id="cars"
+        name="dish"
         required
       >
-        <option value="" selected disabled hidden>
+        <option value="" defaultValue disabled hidden>
           Choose dish
         </option>
         <option value="pizza">Pizza</option>
@@ -72,8 +136,9 @@ function Form() {
             value={soupSpiceness}
             onChange={(e) => setSoupSpiceness(e.target.value)}
             placeholder="Spiceness"
-            type="text"
-            step="50"
+            type="number"
+            min="1"
+            max="10"
             name="soupSpiceness"
             required
           />
@@ -98,4 +163,5 @@ function Form() {
     </form>
   );
 }
+
 export default Form;
